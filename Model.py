@@ -7,6 +7,7 @@ import numpy as np
 from lmfit import minimize, Parameters, fit_report
 import scipy.integrate as scint
 from models import Models
+import pandas as pd
 mpl.use("QtAgg")
 plt.style.use('./AK_Richert.mplstyle')
 #plt.style.use('default')
@@ -16,8 +17,9 @@ class Model:
 
     # Initiation Of The Class
 
-    def __init__(self, delays_filename, spectra_filename, lambdas_filename,
-                 d_limits, l_limits, model, opt_method, ivp_method):
+    def __init__(self,csv_filename, d_limits, l_limits, model, opt_method, ivp_method): 
+        #         delays_filename, spectra_filename, lambdas_filename,
+        #         d_limits, l_limits, model, opt_method, ivp_method):
         """
         Initiates an object of the class Model with preset data and model.
         Presets a list of colors for the 3-in-1 plot.
@@ -42,15 +44,62 @@ class Model:
         None.
 
         """
-        self.d_borders = self.findBorders(d_limits, delays_filename)
-        self.l_borders = self.findBorders(l_limits, lambdas_filename)
-        self.name = self.findName(delays_filename)
-        self.delays = self.initDelays(delays_filename)
-        self.spectra = self.initSpectra(spectra_filename)
-        self.lambdas = self.initLambdas(lambdas_filename)
+        #self.d_borders = self.findBorders(d_limits, delays_filename)
+        #self.l_borders = self.findBorders(l_limits, lambdas_filename)
+        #self.name = self.findName(delays_filename)
+        #self.delays = self.initDelays(delays_filename)
+        #self.spectra = self.initSpectra(spectra_filename)
+        #self.lambdas = self.initLambdas(lambdas_filename)
+        self.d_borders = self.findBordersbyCSV(d_limits, csv_filename, type="delay")
+        self.l_borders = self.findBordersbyCSV(l_limits, csv_filename, type="lambda")
+        self.name = "test"
+        self.delays, self.lambdas, self.spectra = self.initDatabyCSV(csv_filename, self.d_borders, self.l_borders)
         self.model = model
         self.opt_method = opt_method
         self.ivp_method = ivp_method
+
+    def initDatabyCSV(csv_file_name,d_limits,l_limits):
+        df = pd.read_csv(csv_file_name)
+        df = df.iloc[d_limits[0]:d_limits[1],l_limits[0]:l_limits[1]]
+        delays = pd.to_numeric(df.index.values)
+        lambdas = pd.to_numeric(df.columns.values)
+        spectra = df.values
+        return delays, lambdas, spectra
+
+    def findBordersbyCSV(self, limits, csv_filename, type="delay"):
+        """
+        Finds the indices for the chosen limits in a set of values.
+        If none are chosen, the borders will automatically be set.
+
+        Parameters
+        ----------
+        limits : list with two int/float elements
+            Lower and upper limits for the values in the given file.
+        filename : string
+            The path to the file for the values.
+
+        Returns
+        -------
+        borders : list with two int elements
+            Indexes for the lower and upper limit of the values in the file.
+
+        """
+        df = pd.read_csv(csv_filename)
+        if type == "delay":
+            values = pd.to_numeric(df.index.values)
+        elif type == "lambda":
+            values = pd.to_numeric(df.columns.values)
+        borders = [0, 1]
+        if limits == None:
+            limits = [None, None]
+        if limits[0] == None:
+            limits[0] = min(values)
+        if limits[1] == None:
+            limits[1] = max(values)
+        borders[0] = round(np.absolute(values-limits[0]).argmin(),2)
+        borders[1] = round(np.absolute(values-limits[1]).argmin(),2)
+        return borders
+    
 
     def findBorders(self, limits, filename):
         """
