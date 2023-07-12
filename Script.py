@@ -26,13 +26,13 @@ import time as stopwatch
 
 # The directory that contains the data files.
 # Must be a folder with three files ending with "delays.txt" "lambda.txt" "spectra.txt".
-path = "D:\TAS\EfsTA\Test\TA_Average.csv"
+path = "D:\TAS\荧光吸收光谱\\test_data\jacs\\221600_NaCBO-Hex-370nm-UV-0.5mW\TA_Average-crop-bgf-bgn-chirp.csv"
 # Choose model: 0 for GLA, 1-8 for GTA and "custom matrix" for a custom GTA model.
-model = 0
+model = 1
 # Lower and upper limits for the wavelengths and delays.
 # [None, None] to use all data.
-w_bounds = [400, 750]
-d_bounds = [0.2, 3400]
+w_bounds = [None, None]
+d_bounds = [None, None]
 # Plotting the data: 0 doesn't show the plot of the original data,
 # 3 shows the 3-in-1 plot or less subplots if wavelength_slices and delay_slices are empty.
 # 4 shows a 3D contour plot
@@ -40,7 +40,7 @@ orig = 0
 # Plotting the fitted data: 0 doesn't calculate a fit, 1 outputs the fitted
 # parameters, 2 shows the fitted 3-in-1 plot and 3 shows both.
 # 4 shows the fitted 3D contour plot and the fitted parameters
-fit = 1
+fit = 2
 # Plotting the residuals: 0 doesn't show the residuals, 1 and 2 create a 1D or
 # 2D image and 3 shows both. Only works if fit is not 0.
 resi = 0
@@ -101,10 +101,10 @@ cont = 25
 # Do NOT set to values <=0.
 mul = 1000
 
-
+file_type = "handle"
 """Program"""
 
-Controller = Controller.Controller(path)
+Controller = Controller.Controller(path,file_type)
 wavelength_slices.sort()
 delay_slices.sort()
 if model == "custom matrix":
@@ -142,6 +142,7 @@ if model == 0:
 else:
     start = stopwatch.time()
     if fit != 0:
+        
         tau_fit, spec, res, D_fit,fit_report = Controller.calcSAS(GTA_tau, c0, d_bounds,
                                                        w_bounds, model,
                                                        GTA_tau_lb, GTA_tau_ub,

@@ -17,7 +17,7 @@ class Model:
 
     # Initiation Of The Class
 
-    def __init__(self,csv_filename, d_limits, l_limits, model, opt_method, ivp_method): 
+    def __init__(self,csv_filename, file_type, d_limits, l_limits, model, opt_method, ivp_method): 
         #         delays_filename, spectra_filename, lambdas_filename,
         #         d_limits, l_limits, model, opt_method, ivp_method):
         """
@@ -50,26 +50,31 @@ class Model:
         #self.delays = self.initDelays(delays_filename)
         #self.spectra = self.initSpectra(spectra_filename)
         #self.lambdas = self.initLambdas(lambdas_filename)
-        self.d_borders = self.findBordersbyCSV(d_limits, csv_filename, type="delay")
-        self.l_borders = self.findBordersbyCSV(l_limits, csv_filename, type="lambda")
+        self.d_borders = self.findBordersbyCSV(d_limits, csv_filename, file_type, type="delay")
+        self.l_borders = self.findBordersbyCSV(l_limits, csv_filename, file_type, type="lambda")
         self.name = "test"
-        self.delays, self.lambdas, self.spectra = self.initDatabyCSV(csv_filename, self.d_borders, self.l_borders)
+        self.delays, self.lambdas, self.spectra = self.initDatabyCSV(csv_filename, file_type, self.d_borders, self.l_borders)
         self.model = model
         self.opt_method = opt_method
         self.ivp_method = ivp_method
+        self.path = os.getcwd()
 
-    def initDatabyCSV(self, csv_file_name,d_limits,l_limits):
-        df = self.readCSV(csv_file_name)
+    def initDatabyCSV(self, csv_file_name, file_type,d_limits,l_limits):
+        df = self.readCSV(csv_file_name, file_type)
         df = df.iloc[l_limits[0]:l_limits[1],d_limits[0]:d_limits[1]]
         delays = df.columns.values
         lambdas = df.index.values
         spectra = df.values
         return delays, lambdas, spectra
 
-    def readCSV(self, csv_file_name):
-        df = pd.read_csv(csv_file_name, index_col=0)
-        df = df.iloc[:-11,:]
-        df.columns = df.columns.str.replace("0.000000.1","0")
+    def readCSV(self, csv_file_name, file_type="raw"):
+        if file_type == "raw":
+            df = pd.read_csv(csv_file_name, index_col=0)
+            df = df.iloc[:-11,:]
+            df.columns = df.columns.str.replace("0.000000.1","0")
+        else:
+            df = pd.read_csv(csv_file_name,index_col=0,header=0,sep="\t")
+            df.columns = df.columns.str.replace("0.000000000E+0.1","0")
         df.index = pd.to_numeric(df.index)
         df.columns = pd.to_numeric(df.columns)
         #去除nan
@@ -81,7 +86,7 @@ class Model:
         return df
 
 
-    def findBordersbyCSV(self, limits, csv_filename, type="delay"):
+    def findBordersbyCSV(self, limits, csv_filename, file_type,  type="delay"):
         """
         Finds the indices for the chosen limits in a set of values.
         If none are chosen, the borders will automatically be set.
@@ -99,7 +104,7 @@ class Model:
             Indexes for the lower and upper limit of the values in the file.
 
         """
-        df = self.readCSV(csv_filename)
+        df = self.readCSV(csv_filename, file_type)
         if type == "delay":
             values = df.columns.values
         elif type == "lambda":
@@ -588,15 +593,16 @@ class Model:
             The fitted parameters tau_fit and the fixed values tau_fix combined.
 
         """
-
-
+        tau_guess = preparam
+        
         params = Parameters()
         self.tau_fit = []
-        bounds = self.getTauBounds(preparam)
-        #for i in range(len(preparam)):
-        #     params.add('tau'+str(i), preparam[i][0],
-        #                    min=bounds[i][0], max=bounds[i][1],vary=preparam[i][1])
-        params.add('tau0', preparam[1][0],min=bounds[0][0], max=bounds[0][1],vary=preparam[1][1])
+        bounds = self.getTauBounds(tau_guess)
+        #print(tau_guess)
+        #print(bounds)
+        for i in range(len(tau_guess)):
+             params.add('tau'+str(i), tau_guess[i],
+                            min=bounds[i][0], max=bounds[i][1])
         res_fit = minimize(self.getDifference, params, method=opt_method)
         fit_rep = fit_report(res_fit)
         if hasattr(res_fit, "success"):

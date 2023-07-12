@@ -8,7 +8,7 @@ import shelve
 
 class Controller():
 
-    def __init__(self, path):
+    def __init__(self, path, file_type):
         """
         Initiates the controller and loads the data from the given path.
 
@@ -23,10 +23,12 @@ class Controller():
 
         """
         self.path = path
-        self.get_databyCSV(path)
+        self.get_databyCSV(path, file_type)
+        self.labels = ["wavelength / nm", "delay / ps", "intensity / a.u."]
 
-    def get_databyCSV(self, path):
+    def get_databyCSV(self, path, file_type):
         self.csv_filename = path
+        self.file_type = file_type
 
     def get_data(self, path):
         """
@@ -91,7 +93,7 @@ class Controller():
         
         
         
-        self.DAS = Model(self.csv_filename, d_limits, l_limits, 0, opt_method, None)
+        self.DAS = Model(self.csv_filename, self.file_type, d_limits, l_limits, 0, opt_method, None)
                         # self.delays_filename, self.spectra_filename,
                         #  self.lambdas_filename, d_limits, l_limits, 0, opt_method, None)
         self.DAS.M = self.DAS.getM(tau)
@@ -99,13 +101,13 @@ class Controller():
         D_fit = self.DAS.calcD_fit()
         spec = self.DAS.calcA_fit()
         res = self.DAS.calcResiduals()
-        # self.saveResults(0, tau, tau_fit,
-        #                  l_limits, d_limits, spec, D_fit,
-        #                  self.DAS.getTauBounds(tau), self.DAS.lambdas,
-        #                  self.DAS.delays, self.DAS.spectra, fit_report)
+        self.saveResults(0, tau, tau_fit,
+                        l_limits, d_limits, spec, D_fit,
+                        self.DAS.getTauBounds(tau), self.DAS.lambdas,
+                        self.DAS.delays, self.DAS.spectra, fit_report)
         return tau_fit, spec, res, D_fit, fit_report
 
-    def calcSAS(self, K, preparam, C_0, d_limits, l_limits, model, tau_low, tau_high, opt_method, ivp_method):
+    def calcSAS(self, preparam, C_0, d_limits, l_limits, model, tau_low, tau_high, opt_method, ivp_method, K=0):
         """
         Calculated the Species Associated Spectra and outputs the fitted
         decay constants tau, the calculated spectra and the residuals.
@@ -151,8 +153,9 @@ class Controller():
            Fitting results and other fit statistics created by lmfit. 
 
         """
-        tau = [tau[0] for tau in preparam]
-        self.SAS = Model(self.csv_filename, d_limits, l_limits, model, opt_method, ivp_method)
+        #tau = [tau[0] for tau in preparam]
+        tau = [tau for tau in preparam]
+        self.SAS = Model(self.csv_filename, self.file_type, d_limits, l_limits, model, opt_method, ivp_method)
                         # self.delays_filename, self.spectra_filename,
                         #  self.lambdas_filename, d_limits, l_limits, model, 
                         #  opt_method, ivp_method)
@@ -330,7 +333,7 @@ class Controller():
         None.
 
         """
-        self.origData = Model(self.csv_filename, d_limits, l_limits, None, opt_method, ivp_method)
+        self.origData = Model(self.csv_filename, self.file_type, d_limits, l_limits, 0, opt_method, ivp_method)
                         # self.delays_filename, self.spectra_filename,
                         #  self.lambdas_filename, d_limits, l_limits, None, opt_method, ivp_method)
             
