@@ -1,3 +1,6 @@
+import os,sys 
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+sys.path.insert(0,parentdir)  
 import pytest as pt
 from Model import Model
 import numpy as np
@@ -5,20 +8,24 @@ from models import Models
 
 class TestClassModel:
 
-    delays_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_delays.txt"
-    spectra_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_spectra.txt"
-    lambdas_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_lambda.txt"
+    #delays_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_delays.txt"
+    #spectra_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_spectra.txt"
+    #lambdas_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_lambda.txt"
+    csv_filename = "Test\TA_Average.csv"
     d_limits = [0.3, None]
     l_limits = [None, None]
+    opt_method = "Nelder-Mead"
+    ivp_method = "RK45"
 
 
 class Test_init(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            #self.delays_filename,
+            #self.spectra_filename,
+            #self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -64,9 +71,10 @@ class Test_genE_tau(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -91,9 +99,10 @@ class Test_setInitialConcentrations(TestClassModel):
     def setup(self):
         model = 1
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -118,9 +127,10 @@ class Test_calcdCdt(TestClassModel):
     def setup(self):
         model = 1
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -148,9 +158,10 @@ class Test_solveDiff(TestClassModel):
     def setup(self):
         model = 1
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -178,9 +189,10 @@ class Test_getK(TestClassModel):
     def setup(self):
         model = 1
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -210,9 +222,10 @@ class Test_getM(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -235,9 +248,10 @@ class Test_getMlin(TestClassModel):
     def setup(self):
         model = "custom matrix"
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -262,9 +276,10 @@ class Test_regenM(TestClassModel):
     def setup(self):
         model = "custom matrix"
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -290,9 +305,10 @@ class Test_calcD_tau(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -317,9 +333,10 @@ class Test_calcA_tau(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -345,9 +362,10 @@ class Test_getDifference(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -368,9 +386,10 @@ class Test_findx_fit(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -394,9 +413,10 @@ class Test_calcD_fit(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -423,9 +443,10 @@ class Test_calcA_fit(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -452,9 +473,10 @@ class Test_calcResiduals(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -483,9 +505,10 @@ class Test_setv_min(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -505,9 +528,10 @@ class Test_setv_max(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,
@@ -527,9 +551,10 @@ class Test_FindNearestIndex(TestClassModel):
     def setup(self):
         model = 0
         self.mod = Model(
-            self.delays_filename,
-            self.spectra_filename,
-            self.lambdas_filename,
+            # self.delays_filename,
+            # self.spectra_filename,
+            # self.lambdas_filename,
+            self.csv_filename,
             self.d_limits,
             self.l_limits,
             model,

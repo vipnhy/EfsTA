@@ -1,30 +1,35 @@
+import os,sys 
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+sys.path.insert(0,parentdir)  
 import pytest as pt
 from Controller import Controller
 import numpy as np
 
 class TestClassModel:
 
-    con = Controller("/home/hackerman/Documents/fsTA Daten/c_PDI_c")
+    con = Controller("D:\发射光谱处理\EfsTA")
     
 class Test_init(TestClassModel):
     def setup(self):
-        self.delays_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_delays.txt"
-        self.spectra_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_spectra.txt"
-        self.lambdas_filename = "/home/hackerman/Documents/fsTA Daten/c_PDI_c/01_Toluenez20_c_PDI_c_530_tol_lambda.txt"
-    
+        self.csv_filename="D:\发射光谱处理\EfsTA\Test\TA_Average.csv"
+
     def test_type(self):
-        assert [type(self.con.delays_filename),
-                type(self.con.spectra_filename),
-                type(self.con.lambdas_filename)] == [str, str, str]
+        #assert [type(self.con.delays_filename),
+        #        type(self.con.spectra_filename),
+        #        type(self.con.lambdas_filename)] == [str, str, str]
+        assert type(self.con.csv_filename) == str
+
+    def test_values(self):
+        assert self.con.csv_filename == self.csv_filename
+    
+    # def test_values_delays(self):
+    #     assert self.con.delays_filename == self.delays_filename
         
-    def test_values_delays(self):
-        assert self.con.delays_filename == self.delays_filename
+    # def test_values_spectra(self):
+    #     assert self.con.spectra_filename == self.spectra_filename
         
-    def test_values_spectra(self):
-        assert self.con.spectra_filename == self.spectra_filename
-        
-    def test_values_lambdas(self):
-        assert self.con.lambdas_filename == self.lambdas_filename
+    # def test_values_lambdas(self):
+    #     assert self.con.lambdas_filename == self.lambdas_filename
         
 class Test_calcDAS(TestClassModel):
     def setup(self):

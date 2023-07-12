@@ -130,3 +130,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+Test/test_Controller.py
+Test/test_Model.py
+Test/test_models.py

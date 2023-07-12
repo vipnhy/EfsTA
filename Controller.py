@@ -23,7 +23,10 @@ class Controller():
 
         """
         self.path = path
-        self.get_data(path)
+        self.get_databyCSV(path)
+
+    def get_databyCSV(self, path):
+        self.csv_filename = path
 
     def get_data(self, path):
         """
@@ -87,17 +90,19 @@ class Controller():
         tau = [tau[0] for tau in preparam]
         
         
-        self.DAS = Model(self.delays_filename, self.spectra_filename,
-                         self.lambdas_filename, d_limits, l_limits, 0, opt_method, None)
+        
+        self.DAS = Model(self.csv_filename, d_limits, l_limits, 0, opt_method, None)
+                        # self.delays_filename, self.spectra_filename,
+                        #  self.lambdas_filename, d_limits, l_limits, 0, opt_method, None)
         self.DAS.M = self.DAS.getM(tau)
         tau_fit, fit_report = self.DAS.findTau_fit(preparam, opt_method)
         D_fit = self.DAS.calcD_fit()
         spec = self.DAS.calcA_fit()
         res = self.DAS.calcResiduals()
-        self.saveResults(0, tau, tau_fit,
-                         l_limits, d_limits, spec, D_fit,
-                         self.DAS.getTauBounds(tau), self.DAS.lambdas,
-                         self.DAS.delays, self.DAS.spectra, fit_report)
+        # self.saveResults(0, tau, tau_fit,
+        #                  l_limits, d_limits, spec, D_fit,
+        #                  self.DAS.getTauBounds(tau), self.DAS.lambdas,
+        #                  self.DAS.delays, self.DAS.spectra, fit_report)
         return tau_fit, spec, res, D_fit, fit_report
 
     def calcSAS(self, K, preparam, C_0, d_limits, l_limits, model, tau_low, tau_high, opt_method, ivp_method):
@@ -147,9 +152,10 @@ class Controller():
 
         """
         tau = [tau[0] for tau in preparam]
-        self.SAS = Model(self.delays_filename, self.spectra_filename,
-                         self.lambdas_filename, d_limits, l_limits, model, 
-                         opt_method, ivp_method)
+        self.SAS = Model(self.csv_filename, d_limits, l_limits, model, opt_method, ivp_method)
+                        # self.delays_filename, self.spectra_filename,
+                        #  self.lambdas_filename, d_limits, l_limits, model, 
+                        #  opt_method, ivp_method)
         if (model == "custom model" or model == "custom matrix"):
             M_lin = self.SAS.getM_lin(K)
             K,n = self.SAS.getK(M_lin)
@@ -324,8 +330,9 @@ class Controller():
         None.
 
         """
-        self.origData = Model(self.delays_filename, self.spectra_filename,
-                         self.lambdas_filename, d_limits, l_limits, None, opt_method, ivp_method)
+        self.origData = Model(self.csv_filename, d_limits, l_limits, None, opt_method, ivp_method)
+                        # self.delays_filename, self.spectra_filename,
+                        #  self.lambdas_filename, d_limits, l_limits, None, opt_method, ivp_method)
             
     def plotCustom(self, wave, time, v_min, v_max, model, cont, custom, mul,
                    add=""):

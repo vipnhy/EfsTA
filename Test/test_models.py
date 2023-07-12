@@ -1,3 +1,6 @@
+import os,sys 
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
+sys.path.insert(0,parentdir)  
 import pytest as pt
 from models import Models
 import numpy as np

@@ -58,13 +58,28 @@ class Model:
         self.opt_method = opt_method
         self.ivp_method = ivp_method
 
-    def initDatabyCSV(csv_file_name,d_limits,l_limits):
-        df = pd.read_csv(csv_file_name)
-        df = df.iloc[d_limits[0]:d_limits[1],l_limits[0]:l_limits[1]]
-        delays = pd.to_numeric(df.index.values)
-        lambdas = pd.to_numeric(df.columns.values)
+    def initDatabyCSV(self, csv_file_name,d_limits,l_limits):
+        df = self.readCSV(csv_file_name)
+        df = df.iloc[l_limits[0]:l_limits[1],d_limits[0]:d_limits[1]]
+        delays = df.columns.values
+        lambdas = df.index.values
         spectra = df.values
         return delays, lambdas, spectra
+
+    def readCSV(self, csv_file_name):
+        df = pd.read_csv(csv_file_name, index_col=0)
+        df = df.iloc[:-11,:]
+        df.columns = df.columns.str.replace("0.000000.1","0")
+        df.index = pd.to_numeric(df.index)
+        df.columns = pd.to_numeric(df.columns)
+        #去除nan
+        df = df.fillna(0)
+        #设置inf为最大值
+        df = df.replace(np.inf, 0)
+        #设置-inf为最小值
+        df = df.replace(-np.inf, 0)
+        return df
+
 
     def findBordersbyCSV(self, limits, csv_filename, type="delay"):
         """
@@ -84,11 +99,11 @@ class Model:
             Indexes for the lower and upper limit of the values in the file.
 
         """
-        df = pd.read_csv(csv_filename)
+        df = self.readCSV(csv_filename)
         if type == "delay":
-            values = pd.to_numeric(df.index.values)
+            values = df.columns.values
         elif type == "lambda":
-            values = pd.to_numeric(df.columns.values)
+            values = df.index.values
         borders = [0, 1]
         if limits == None:
             limits = [None, None]
@@ -96,8 +111,10 @@ class Model:
             limits[0] = min(values)
         if limits[1] == None:
             limits[1] = max(values)
-        borders[0] = round(np.absolute(values-limits[0]).argmin(),2)
-        borders[1] = round(np.absolute(values-limits[1]).argmin(),2)
+            
+        borders[0] = np.absolute(values-limits[0]).argmin()
+        borders[1] = np.absolute(values-limits[1]).argmin()
+
         return borders
     
 
@@ -500,6 +517,7 @@ class Model:
             The matrix D_tau.
 
         """
+        
         res1 = self.spectra @ self.M.T
         res2 = self.M @ self.M.T
         inv = np.linalg.inv(res2)
@@ -570,12 +588,15 @@ class Model:
             The fitted parameters tau_fit and the fixed values tau_fix combined.
 
         """
+
+
         params = Parameters()
         self.tau_fit = []
         bounds = self.getTauBounds(preparam)
-        for i in range(len(preparam)):
-            params.add('tau'+str(i), preparam[i][0],
-                           min=bounds[i][0], max=bounds[i][1],vary=preparam[i][1])
+        #for i in range(len(preparam)):
+        #     params.add('tau'+str(i), preparam[i][0],
+        #                    min=bounds[i][0], max=bounds[i][1],vary=preparam[i][1])
+        params.add('tau0', preparam[1][0],min=bounds[0][0], max=bounds[0][1],vary=preparam[1][1])
         res_fit = minimize(self.getDifference, params, method=opt_method)
         fit_rep = fit_report(res_fit)
         if hasattr(res_fit, "success"):

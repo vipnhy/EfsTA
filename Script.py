@@ -26,12 +26,12 @@ import time as stopwatch
 
 # The directory that contains the data files.
 # Must be a folder with three files ending with "delays.txt" "lambda.txt" "spectra.txt".
-path = "/home/user/Documents/data"
+path = "D:\TAS\EfsTA\Test\TA_Average.csv"
 # Choose model: 0 for GLA, 1-8 for GTA and "custom matrix" for a custom GTA model.
 model = 0
 # Lower and upper limits for the wavelengths and delays.
 # [None, None] to use all data.
-w_bounds = [350, 750]
+w_bounds = [400, 750]
 d_bounds = [0.2, 3400]
 # Plotting the data: 0 doesn't show the plot of the original data,
 # 3 shows the 3-in-1 plot or less subplots if wavelength_slices and delay_slices are empty.
