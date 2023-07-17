@@ -26,9 +26,9 @@ import time as stopwatch
 
 # The directory that contains the data files.
 # Must be a folder with three files ending with "delays.txt" "lambda.txt" "spectra.txt".
-path = "D:\TAS\荧光吸收光谱\\test_data\jacs\\221600_NaCBO-Hex-370nm-UV-0.5mW\TA_Average-crop-bgf-bgn-chirp.csv"
+path = "D:\\TAS\\EfsTA\\Test\\TA_Average-crop-crop.csv"
 # Choose model: 0 for GLA, 1-8 for GTA and "custom matrix" for a custom GTA model.
-model = 1
+model = 9
 # Lower and upper limits for the wavelengths and delays.
 # [None, None] to use all data.
 w_bounds = [None, None]
@@ -55,7 +55,7 @@ opt_method = 'Nelder-Mead'
 """Settings for Global Lifetime Analysis"""
 
 # The guessed lifetimes which will be fitted.
-GLA_tau_guess = [1,100]
+GLA_tau_guess = [1, 10, 100 ,1000]
 # The lifetimes which won't be fitted.
 GLA_tau_fix = [900000]
 
@@ -63,18 +63,18 @@ GLA_tau_fix = [900000]
 """Settings for Global Target Analysis"""
 
 # The guessed lifetimes which will be fitted.
-GTA_tau = [1, 100, 9e5]
+GTA_tau = [0.1, 1, 100, 1000]
 # Lower and upper limits for the fitting of the lifetimes.
-GTA_tau_lb = [0, 0, 8e5] # No bounds: GTA_tau_lb = None
-GTA_tau_ub = [3e2, 1e5, 10e5] # No bounds: GTA_tau_ub = None
+GTA_tau_lb = [0,0.1,1,100] # No bounds: GTA_tau_lb = None
+GTA_tau_ub = [1,100,1000,5000] # No bounds: GTA_tau_ub = None
 # The inital concentrations. If empty all concentrations will be set to 0
 # except the first one which will be 1. Def.: []
 c0 = []
 # A custom matrix for the GTA which only works if model=="custom matrix"
 # and the dimension of the matrix is (n,n).
-M = [[-4001, 300, 0],
- [1, -320,  0],
- [4000, 20, 0]]
+#M = [[-4001, 300, 0],
+# [1, -320,  0],
+# [4000, 20, 0]]
 # M = np.genfromtxt("path")
 # Algorithm used for solving the ivp
 ivp_method = "BDF"
@@ -143,10 +143,19 @@ else:
     start = stopwatch.time()
     if fit != 0:
         
-        tau_fit, spec, res, D_fit,fit_report = Controller.calcSAS(GTA_tau, c0, d_bounds,
+        if model != "custom matrix":
+            tau_fit, spec, res, D_fit,fit_report = Controller.calcSAS(GTA_tau, c0, d_bounds,
                                                        w_bounds, model,
                                                        GTA_tau_lb, GTA_tau_ub,
                                                        opt_method, ivp_method)
+        else:
+            tau_fit, spec, res, D_fit, fit_report = Controller.calcSAS(GTA_tau, c0, d_bounds,
+                                                       w_bounds, model,
+                                                       GTA_tau_lb, GTA_tau_ub,
+                                                       opt_method, ivp_method, M)
+        
+
+
         print("runtime GTA:", stopwatch.time()-start)
     if fit == 1:
         if model != "custom matrix":
@@ -206,7 +215,7 @@ add = "1+2"
 
 # Controller.plotCustom(wavelength_slices, delay_slices, v_min, v_max, model, cont, custom, mul, add)
 
-# if fit != 0:
-#     if model != 0:
-#         Controller.plotKinetics(model)
-#     Controller.plotDAS(model, tau_fit, mul)
+if fit != 0:
+    if model != 0:
+        Controller.plotKinetics(model)
+    Controller.plotDAS(model, tau_fit, mul)

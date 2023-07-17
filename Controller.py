@@ -514,8 +514,10 @@ class Controller():
             self.DAS.plotData(self.DAS.delays, self.DAS.M.T, self.labels[1],
                               "concentration",label = None, add="_GLA_kin")
         else:
+            #label = None
+            label = ["0","1","2","3"]
             self.SAS.plotData(self.SAS.delays, self.SAS.M.T, self.labels[1],
-                              "concentration",label = None, add="_GTA_kin")
+                              "concentration",label = label, add="_GTA_kin")
         
     def plotDAS(self, model, tau, mul):
         """

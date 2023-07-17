@@ -11,6 +11,7 @@
 # Model 6: A -> B -> C -> D -> E -> F; C -> F
 # Model 7: A -> B; A -> C
 # Model 8: A -> B ; B -> C ; B -> D
+# Model 9: A -> B -> C -> D -> 0; B -> 0; C -> 0; D -> 0
 
 import numpy as np
 
@@ -57,6 +58,8 @@ class Models:
             K, n = self.model7()
         elif model == 8:
             K, n = self.model8()
+        elif model == 9:
+            K, n = self.model9()
         return K, n
 
     def model1(self):
@@ -304,3 +307,37 @@ class Models:
         K[3][1] = self.k[2]
         n = 4
         return K, n
+
+    def model9(self):
+        '''
+
+        Model 9: A -> B -> C -> D -> 0
+                    B -> 0
+                    C -> 0
+                    D -> 0
+
+        Generates the matrix K.
+
+        In this model the last species does not react any further.
+        ONLY four reaction rate constants are allowed.
+
+        Returns
+        -------
+        K : np.array
+            A 2D array which corresponds to the reaction rate constant matrix.
+
+        '''
+
+        K = np.zeros((4,4))
+        K[0][0] = -self.k[0]
+        K[1][0] = self.k[0]
+        K[1][1] = -2*self.k[1]
+        K[2][1] = self.k[1]
+        K[2][2] = -2*self.k[2]
+        K[3][2] = self.k[2]
+        K[3][3] = -self.k[3]
+        n = 4
+        return K, n
+    
+
+        

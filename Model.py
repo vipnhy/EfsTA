@@ -594,7 +594,9 @@ class Model:
 
         """
         tau_guess = preparam
-        
+        #tau_guess = [tau_guess[i][0] for i in range(len(tau_guess))]
+
+
         params = Parameters()
         self.tau_fit = []
         bounds = self.getTauBounds(tau_guess)
@@ -1169,7 +1171,8 @@ class Model:
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
         if add == "_GTA_kin" or add == "_GLA_kin":
-            ax.set_xscale("log")
+            ax.set_xscale("symlog")
+            ax.set_xlim(-1e1,1e5)
             fig.set_size_inches(7.6,4)
         else:
             ax.axhline(0, color="black", lw=0.5, alpha = 0.75)
