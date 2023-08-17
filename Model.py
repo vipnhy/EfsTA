@@ -72,9 +72,13 @@ class Model:
             df = pd.read_csv(csv_file_name, index_col=0)
             df = df.iloc[:-11,:]
             df.columns = df.columns.str.replace("0.000000.1","0")
-        else:
+        elif file_type == "handle":
             df = pd.read_csv(csv_file_name,index_col=0,header=0,sep="\t")
             df.columns = df.columns.str.replace("0.000000000E+0.1","0")
+        elif file_type == "dat":
+            df = pd.read_csv(csv_file_name,index_col=0,header=0,sep="\t")
+            df = df.T
+
         df.index = pd.to_numeric(df.index)
         df.columns = pd.to_numeric(df.columns)
         #去除nan
@@ -386,14 +390,15 @@ class Model:
 
         """
         ones = np.full(tau_guess.shape, 1)
+        #k_guess = ones // tau_guess
         k_guess = np.divide(ones, tau_guess, out=np.zeros_like(tau_guess),
                             where=tau_guess!=0)
         M_lin = []
         M_ones = np.zeros(k_guess.shape)
         for i in range(k_guess.shape[0]):
             for j in range(k_guess.shape[1]):
-                if i == j and i != k_guess.shape[0]-1:
-                    k_guess[i][j] = 0
+                #if i == j and i != k_guess.shape[0]-1:
+                #    k_guess[i][j] = 0
                 if k_guess[i][j] != 0:
                     M_ones[i][j] = 1
                     M_lin.append(abs(k_guess[i][j]))
@@ -423,10 +428,12 @@ class Model:
             for j in range(self.M_ones.shape[1]):
                 if self.M_ones[i][j] == 1:
                     M[i][j] = tau_guess[a]
-                    if j != self.M_ones.shape[0]-1:
+                    if j != self.M_ones.shape[0]-1 and M[j][j] == 0:
                         M[j][j] -= tau_guess[a]
                     a += 1
-        M[-1][-1] *= -1
+        for i in range(M.shape[0]):
+            if M[i][i] > 0:
+                M[i][i] *= -1
         return M
     
     def setTauBounds(self, tau_low, tau_high, tau):
@@ -503,7 +510,7 @@ class Model:
            M = self.genE_tau(tau)
            self.n = len(tau)
        else:  # GTA
-           self.K, n = self.getK(tau)
+           self.K,n = self.getK(tau)
            M = self.solveDiff(self.K, self.ivp_method)
        return M
 
@@ -594,14 +601,14 @@ class Model:
 
         """
         tau_guess = preparam
-        #tau_guess = [tau_guess[i][0] for i in range(len(tau_guess))]
-
+        if (self.model == "custom model" or self.model == "custom matrix"):
+            tau_guess = [tau_guess[i][0] for i in range(len(tau_guess))]
+            
+        
 
         params = Parameters()
         self.tau_fit = []
         bounds = self.getTauBounds(tau_guess)
-        #print(tau_guess)
-        #print(bounds)
         for i in range(len(tau_guess)):
              params.add('tau'+str(i), tau_guess[i],
                             min=bounds[i][0], max=bounds[i][1])

@@ -240,7 +240,8 @@ class MainWindow(QW.QMainWindow):
             directory = self.ui.Data_directory.text()
         self.finalInputs['Directory'] = directory
         if self.ui.Data_directory.text() != "":
-            self.Controller = Cont.Controller(self.getFolderPath())
+            self.Controller = Cont.Controller(self.getFolderPath(),file_type = "handle")
+            '''
             path = self.Controller.path+"/"
             names = ["delays_filename","lambdas_filename", "spectra_filename"]
             if all(hasattr(self.Controller, attr) for attr in names) == False:
@@ -255,7 +256,7 @@ class MainWindow(QW.QMainWindow):
                 pickle = path + txt + ".dir"
                 if os.path.isfile(pickle):
                     self.setPickle()
-
+            '''
     def getFolderPath(self):
         """
         Checks if a folder directory was selected and returns it.

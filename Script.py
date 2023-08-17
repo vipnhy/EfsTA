@@ -26,9 +26,9 @@ import time as stopwatch
 
 # The directory that contains the data files.
 # Must be a folder with three files ending with "delays.txt" "lambda.txt" "spectra.txt".
-path = "D:\\TAS\\EfsTA\\Test\\TA_Average-crop-crop.csv"
+path = "D:\Documents\WeChat Files/vipnhy\FileStorage\File/2023-08/1.dat"
 # Choose model: 0 for GLA, 1-8 for GTA and "custom matrix" for a custom GTA model.
-model = 9
+model = "custom matrix"
 # Lower and upper limits for the wavelengths and delays.
 # [None, None] to use all data.
 w_bounds = [None, None]
@@ -55,7 +55,7 @@ opt_method = 'Nelder-Mead'
 """Settings for Global Lifetime Analysis"""
 
 # The guessed lifetimes which will be fitted.
-GLA_tau_guess = [1, 10, 100 ,1000]
+GLA_tau_guess = [1, 10, 100 ,1000, 10000]
 # The lifetimes which won't be fitted.
 GLA_tau_fix = [900000]
 
@@ -63,21 +63,23 @@ GLA_tau_fix = [900000]
 """Settings for Global Target Analysis"""
 
 # The guessed lifetimes which will be fitted.
-GTA_tau = [0.1, 1, 100, 1000]
+GTA_tau = []
 # Lower and upper limits for the fitting of the lifetimes.
-GTA_tau_lb = [0,0.1,1,100] # No bounds: GTA_tau_lb = None
-GTA_tau_ub = [1,100,1000,5000] # No bounds: GTA_tau_ub = None
+GTA_tau_lb = [0.9,0,50,100,100] # No bounds: GTA_tau_lb = []
+GTA_tau_ub = [1.1,10000,10000,10000,10000] # No bounds: GTA_tau_ub = []
 # The inital concentrations. If empty all concentrations will be set to 0
 # except the first one which will be 1. Def.: []
-c0 = []
+c0 = [1,1,0,0,0]
 # A custom matrix for the GTA which only works if model=="custom matrix"
 # and the dimension of the matrix is (n,n).
-#M = [[-4001, 300, 0],
-# [1, -320,  0],
-# [4000, 20, 0]]
+M = [[0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0],
+    [0, 0, 100, 500, 0],
+    [0, 50, 0, 0, 1000.0]]
 # M = np.genfromtxt("path")
 # Algorithm used for solving the ivp
-ivp_method = "BDF"
+ivp_method = "RK23"
 # Options:
 # 'RK45' 'RK23' 'DOP853' 'Radau' 'BDF' 'LSODA'
 
@@ -101,7 +103,7 @@ cont = 25
 # Do NOT set to values <=0.
 mul = 1000
 
-file_type = "handle"
+file_type = "dat"
 """Program"""
 
 Controller = Controller.Controller(path,file_type)
@@ -110,6 +112,7 @@ delay_slices.sort()
 if model == "custom matrix":
     M = np.array(M)
     ones = np.full(M.shape, 1)
+    #GTA_tau = ones // M
     GTA_tau = np.divide(ones, M, out=np.zeros_like(M), where=M!=0)
     
 
@@ -196,8 +199,7 @@ if fit != 0:
         Controller.plot2Dresiduals(v_min, v_max, model, cont, mul)
         
 if orig == 3:
-    Controller.plot3OrigData(wavelength_slices, delay_slices, v_min, v_max, d_bounds, w_bounds, 
-                             cont, mul, opt_method, ivp_method)
+    Controller.plot3OrigData(wavelength_slices, delay_slices, v_min, v_max, cont, mul)
 if orig ==4:
     Controller.plot3DOrigData(v_min, v_max, d_bounds, w_bounds, 
                              mul, opt_method, ivp_method)

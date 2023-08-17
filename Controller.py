@@ -162,12 +162,13 @@ class Controller():
         if (model == "custom model" or model == "custom matrix"):
             M_lin = self.SAS.getM_lin(K)
             K,n = self.SAS.getK(M_lin)
+            print("K", K)
             self.SAS.setTauBounds(tau_low, tau_high, M_lin)
             if model == "custom matrix":
                 preparam = [(tau,True) for tau in M_lin]
         else:
             self.SAS.setTauBounds(tau_low, tau_high, tau)   
-            K,n = self.SAS.getK(tau)                    
+            K,n = self.SAS.getK(tau)                   
         self.SAS.setInitialConcentrations(C_0)
         self.SAS.solveDiff(self.SAS.K, ivp_method)
         tau_fit, fit_report = self.SAS.findTau_fit(preparam, opt_method)
@@ -607,7 +608,7 @@ class Controller():
 
         """
         for i,n in enumerate(tau_fit):
-            tau_fit[i] = round(n,2)
+            tau_fit[i] = np.round(n,2)
         time_unit = self.labels[1].split("/")[1]
         x_axis_unit = self.labels[0].split("/")[1]
         if model == 0:
